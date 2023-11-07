@@ -1,0 +1,56 @@
+<div id="CMDConfigPage" data-role="page" class="page type-interior pluginConfigurationPage fullWidthContent"
+    data-controller="__plugin/CMetadataDB.js">
+    <div class="content-primary">
+        <div class="verticalSection">
+            <div class="sectionTitleContainer">
+                <h2 class="sectionTitle">Custom Metadata db Agent</h2>
+                <a is="emby-linkbutton" class="raised raised-mini" style="margin-left: 2em;" target="_blank"
+                   href="https://github.com/ArabCoders/jf-custom-metadata-db">
+                    <i class="md-icon button-icon button-icon-left secondaryText"></i>
+                    <span>Help</span>
+                </a>
+            </div>
+        </div>
+        <form id="CMDConfigForm">
+            <div class="inputContainer">
+                <input is="emby-input" type="text" id="api_url" name="api_url" label="URL for the custom database." />
+                <div class="fieldDescription">
+                    The plugin require simple JSON response with the at least these minimal structure for complete
+                    List of possible fields see the the DTO object.
+                    <br>
+                    <code style="white-space: pre;">
+[
+    {
+        "id": "unique id for example jf-1234",
+        "title": "The Presented title",
+        "matcher": [
+            "List of possible folder names to match",
+        ],
+    }
+    ,...
+]
+                    </code>
+                </div>
+            </div>
+            <div class="inputContainer">
+                <input is="emby-input" type="text" id="api_ref_url" name="api_ref_url"
+                    label="URL for the database reference." />
+                <div class="fieldDescription">
+                    The url for database reference for example:
+                    <br>
+                    <code>
+                            https://www.thetvdb.com/?tab=series&id={0}
+                        </code>
+                    <br>
+                    Notice the <b>{0}</b> it must exists on the url as it will be replaced with given id.
+                </div>
+            </div>
+
+            <div>
+                <button is="emby-button" type="submit" class="raised button-submit block">
+                    <span>${Save}</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
