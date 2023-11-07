@@ -39,7 +39,7 @@ namespace CustomMetadataDB.Helpers
             if (string.IsNullOrEmpty(data.Id))
             {
                 Logger?.LogInformation($"No Id found for {data}.");
-                return errorOut();
+                return ErrorOut();
             }
 
             item.SetProviderId(Constants.PLUGIN_NAME, data.Id);
@@ -47,7 +47,7 @@ namespace CustomMetadataDB.Helpers
             if (string.IsNullOrEmpty(data.Title))
             {
                 Logger?.LogInformation($"No Title found for {data}.");
-                return errorOut();
+                return ErrorOut();
             }
             item.Name = data.Title;
 
@@ -85,7 +85,7 @@ namespace CustomMetadataDB.Helpers
             };
         }
 
-        private static MetadataResult<Series> errorOut()
+        private static MetadataResult<Series> ErrorOut()
         {
             return new MetadataResult<Series>
             {
