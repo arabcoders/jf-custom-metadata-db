@@ -1,22 +1,9 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace CustomMetadataDB.Helpers
 {
-    /// <summary>
-    /// Object that represent the json response body.
-    /// </summary>
-    public sealed class JsonResponse
-    {
-        public DTO[] Data { get; set; } = Array.Empty<DTO>();
-        public override string ToString()
-        {
-            return JsonSerializer.Serialize(this);
-        }
-    }
-
     /// <summary>
     /// Object that represent how data from yt-dlp should look like.
     /// </summary>
@@ -35,7 +22,6 @@ namespace CustomMetadataDB.Helpers
         /// <summary>
         /// List of strings that match the search query.
         /// </summary>
-        [DataMember(IsRequired = true)]
         public string[] Matcher { get; set; } = Array.Empty<string>();
         /// <summary>
         /// Series plot summary.

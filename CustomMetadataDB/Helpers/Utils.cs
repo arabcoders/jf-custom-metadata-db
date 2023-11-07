@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
 
 namespace CustomMetadataDB.Helpers
 {
@@ -28,17 +30,68 @@ namespace CustomMetadataDB.Helpers
                 ProviderIds = new Dictionary<string, string> { { Constants.PLUGIN_NAME, provider_id } },
             };
         }
-        public static MetadataResult<Series> YTDLJsonToSeries(DTO data)
+        public static MetadataResult<Series> ToSeries(DTO data)
         {
             Logger?.LogInformation($"Processing {data}.");
+
             var item = new Series();
-            var result = new MetadataResult<Series>
+
+            if (string.IsNullOrEmpty(data.Id))
+            {
+                Logger?.LogInformation($"No Id found for {data}.");
+                return errorOut();
+            }
+
+            item.SetProviderId(Constants.PLUGIN_NAME, data.Id);
+
+            if (string.IsNullOrEmpty(data.Title))
+            {
+                Logger?.LogInformation($"No Title found for {data}.");
+                return errorOut();
+            }
+            item.Name = data.Title;
+
+            if (!string.IsNullOrEmpty(data.Title))
+            {
+                item.Overview = data.Description;
+            }
+
+            if (data.Rating != null)
+            {
+                item.CommunityRating = data.Rating;
+            }
+
+            if (!string.IsNullOrEmpty(data.RatingGuide))
+            {
+                item.OfficialRating = data.RatingGuide;
+            }
+
+            if (data.Genres.Length > 0)
+            {
+                item.Genres = data.Genres;
+            }
+
+            if (null != data.Premiere && data.Premiere is DateTime time)
+            {
+                var date = time;
+                item.PremiereDate = date;
+                item.ProductionYear = int.Parse(date.ToString("yyyy"));
+            }
+
+            return new MetadataResult<Series>
             {
                 HasMetadata = true,
                 Item = item
             };
-            result.Item.ProviderIds.Add(Constants.PLUGIN_NAME, data.Id);
-            return result;
+        }
+
+        private static MetadataResult<Series> errorOut()
+        {
+            return new MetadataResult<Series>
+            {
+                HasMetadata = true,
+                Item = new Series()
+            };
         }
     }
 }

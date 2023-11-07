@@ -1,4 +1,5 @@
 using CustomMetadataDB.Helpers;
+using MediaBrowser.Common.Net;
 using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Providers;
@@ -7,9 +8,12 @@ using MediaBrowser.Model.Providers;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace CustomMetadataDB
 {
@@ -29,6 +33,7 @@ namespace CustomMetadataDB
             Utils.Logger = logger;
             _fileSystem = fileSystem;
             _httpClientFactory = httpClientFactory;
+
         }
 
         public virtual string Name { get; } = Constants.PLUGIN_NAME;
@@ -36,12 +41,22 @@ namespace CustomMetadataDB
         public virtual Task<MetadataResult<T>> GetMetadata(E info, CancellationToken cancellationToken)
         {
             _logger.LogDebug("CMD GetMetadata: {Path}", info.Path);
-            return Task.FromResult(GetMetadataImpl(info));
+
+            return GetMetadataImpl(info, cancellationToken);
         }
 
-        internal abstract MetadataResult<T> GetMetadataImpl(E data);
+        internal abstract Task<MetadataResult<T>> GetMetadataImpl(E data, CancellationToken cancellationToken);
 
         public Task<IEnumerable<RemoteSearchResult>> GetSearchResults(E searchInfo, CancellationToken cancellationToken) => throw new NotImplementedException();
         public virtual Task<HttpResponseMessage> GetImageResponse(string url, CancellationToken cancellationToken) => throw new NotImplementedException();
+
+        protected Task<HttpResponseMessage> QueryAPI(string type, string name, CancellationToken cancellationToken, int limit = 1)
+        {
+            var apiUrl = Plugin.Instance.Configuration.ApiUrl;
+            apiUrl += string.IsNullOrEmpty(new Uri(apiUrl).Query) ? "?" : "&";
+            apiUrl += $"type={type}&limit={limit}&&query={HttpUtility.UrlEncode(name)}";
+
+            return _httpClientFactory.CreateClient(NamedClient.Default).GetAsync(new Uri(apiUrl), cancellationToken);
+        }
     }
 }
