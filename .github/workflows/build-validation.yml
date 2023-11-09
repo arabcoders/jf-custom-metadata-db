@@ -47,7 +47,7 @@ jobs:
         shell: bash
         run: |
           tag=$(git describe --tags --always)
-          release_name="YTINFOReader-${tag}"
+          release_name="CustomMetadataDB-${tag}"
 
           # Pack files
           7z a -tzip "${release_name}.zip" "./bin/*.dll"
