@@ -10,7 +10,7 @@ namespace CustomMetadataDB
     {
         public bool Supports(IHasProviderIds item) => item is Series;
         public string ProviderName => Constants.PLUGIN_NAME;
-        public string Key => Constants.PLUGIN_NAME;
+        public string Key => Constants.PLUGIN_EXTERNAL_ID;
         public ExternalIdMediaType? Type => ExternalIdMediaType.Series;
         public string UrlFormatString => Plugin.Instance.Configuration.ApiRefUrl;
     }

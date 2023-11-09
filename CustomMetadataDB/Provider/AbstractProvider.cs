@@ -47,7 +47,52 @@ namespace CustomMetadataDB
 
         internal abstract Task<MetadataResult<T>> GetMetadataImpl(E data, CancellationToken cancellationToken);
 
-        public Task<IEnumerable<RemoteSearchResult>> GetSearchResults(E searchInfo, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(E searchInfo, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            _logger.LogDebug($"CMD Series GetMetadata: {searchInfo.Name} ({searchInfo.Path})");
+
+            var result = new List<RemoteSearchResult>();
+
+            try
+            {
+                using var httpResponse = await QueryAPI("series", searchInfo.Name, cancellationToken, limit: 20).ConfigureAwait(false);
+
+                if (httpResponse.StatusCode != HttpStatusCode.OK)
+                {
+                    _logger.LogInformation($"CMD Series GetMetadata: {searchInfo.Name} ({searchInfo.Path}) - Status Code: {httpResponse.StatusCode}");
+                    return result;
+                }
+
+                DTO[] seriesRootObject = await JsonSerializer.DeserializeAsync<DTO[]>(
+                    utf8Json: await httpResponse.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false),
+                    options: Utils.JSON_OPTS,
+                    cancellationToken: cancellationToken
+                ).ConfigureAwait(false);
+
+                foreach (var series in seriesRootObject)
+                {
+                    result.Add(new RemoteSearchResult
+                    {
+                        Name = series.Title,
+                        ProviderIds = new Dictionary<string, string> { { Constants.PLUGIN_EXTERNAL_ID, series.Id } },
+                    });
+                }
+
+                _logger.LogDebug($"CMD Series GetMetadata Result: {result}");
+                return result;
+            }
+            catch (HttpRequestException exception)
+            {
+                if (exception.StatusCode.HasValue && exception.StatusCode.Value == HttpStatusCode.NotFound)
+                {
+                    return result;
+                }
+
+                throw;
+            }
+        }
         public virtual Task<HttpResponseMessage> GetImageResponse(string url, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         protected Task<HttpResponseMessage> QueryAPI(string type, string name, CancellationToken cancellationToken, int limit = 1)

@@ -12,6 +12,7 @@ namespace CustomMetadataDB
     public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
     {
         public override string Name => Constants.PLUGIN_NAME;
+        public override string Description => Constants.PLUGIN_DESCRIPTION;
         public static Plugin Instance { get; private set; }
         public override Guid Id => Guid.Parse(Constants.PLUGIN_GUID);
         public Plugin(IApplicationPaths applicationPaths, IXmlSerializer xmlSerializer) : base(applicationPaths, xmlSerializer)

@@ -7,7 +7,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 
 namespace CustomMetadataDB.Helpers
 {
@@ -27,7 +26,7 @@ namespace CustomMetadataDB.Helpers
             {
                 Name = name,
                 Type = PersonType.Director,
-                ProviderIds = new Dictionary<string, string> { { Constants.PLUGIN_NAME, provider_id } },
+                ProviderIds = new Dictionary<string, string> { { Constants.PLUGIN_EXTERNAL_ID, provider_id } },
             };
         }
         public static MetadataResult<Series> ToSeries(DTO data)
@@ -42,7 +41,7 @@ namespace CustomMetadataDB.Helpers
                 return ErrorOut();
             }
 
-            item.SetProviderId(Constants.PLUGIN_NAME, data.Id);
+            item.SetProviderId(Constants.PLUGIN_EXTERNAL_ID, data.Id);
 
             if (string.IsNullOrEmpty(data.Title))
             {

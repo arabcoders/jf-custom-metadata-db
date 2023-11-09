@@ -6,8 +6,6 @@ using CustomMetadataDB.Helpers;
 using MediaBrowser.Controller.Configuration;
 using System.Net;
 using System.Net.Http;
-using MediaBrowser.Common.Net;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text.Json;
