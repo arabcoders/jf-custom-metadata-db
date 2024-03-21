@@ -33,7 +33,7 @@ namespace CustomMetadataDB.Helpers
         }
         public static MetadataResult<Series> ToSeries(DTO data)
         {
-            Logger?.LogInformation($"Processing {data}.");
+            Logger?.LogDebug($"Processing {data}.");
 
             var item = new Series();
 
@@ -129,7 +129,7 @@ namespace CustomMetadataDB.Helpers
             string title = matcher.Groups["title"].Success ? matcher.Groups["title"].Value : "";
             if (title != "")
             {
-                if (title != series && title.ToLower().Contains(series.ToLower()))
+                if (!string.IsNullOrEmpty(series) && title != series && title.ToLower().Contains(series.ToLower()))
                 {
                     title = title.Replace(series, "", StringComparison.OrdinalIgnoreCase).Trim();
                 }
@@ -196,7 +196,7 @@ namespace CustomMetadataDB.Helpers
                 return ErrorOutEpisode();
             }
 
-            Logger?.LogInformation($"Processing {data}.");
+            Logger?.LogDebug($"Processing {data}.");
 
             Episode item = new()
             {
@@ -213,7 +213,7 @@ namespace CustomMetadataDB.Helpers
                 item.ForcedSortName = time.ToString("yyyyMMdd") + '-' + item.Name;
             }
 
-            item.ProviderIds.Add(Constants.PLUGIN_EXTERNAL_ID, data.ProviderIds[Constants.PLUGIN_EXTERNAL_ID]);
+            item.SetProviderId(Constants.PLUGIN_EXTERNAL_ID, data.ProviderIds[Constants.PLUGIN_EXTERNAL_ID]);
 
             return new MetadataResult<Episode>
             {

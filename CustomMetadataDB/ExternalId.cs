@@ -14,4 +14,13 @@ namespace CustomMetadataDB
         public ExternalIdMediaType? Type => ExternalIdMediaType.Series;
         public string UrlFormatString => Plugin.Instance.Configuration.ApiRefUrl;
     }
+
+    public class EpisodeExternalId : IExternalId
+    {
+        public bool Supports(IHasProviderIds item) => item is Episode;
+        public string ProviderName => Constants.PLUGIN_NAME;
+        public string Key => Constants.PLUGIN_EXTERNAL_ID;
+        public ExternalIdMediaType? Type => ExternalIdMediaType.Episode;
+        public string UrlFormatString => Plugin.Instance.Configuration.ApiRefUrl;
+    }
 }
