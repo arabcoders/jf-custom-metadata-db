@@ -140,8 +140,8 @@ namespace CustomMetadataDB.Helpers
                 }
 
                 // -- replace double spaces with single space
-                title = Regex.Replace(title, @"\s+", " ");
                 title = Regex.Replace(title, @"\[.+?\]", " ").Trim('-').Trim();
+                title = Regex.Replace(title, @"\s+", " ");
                 title = title.Trim().Trim('-').Trim();
 
                 if (matcher.Groups["epNumber"].Success)
