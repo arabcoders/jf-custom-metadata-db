@@ -190,6 +190,12 @@ namespace CustomMetadataDB.Helpers
 
         public static MetadataResult<Episode> ToEpisode(EpisodeInfo data)
         {
+            if (data.Path == "")
+            {
+                Logger?.LogInformation($"No metadata found for '{data.Path}'.");
+                return ErrorOutEpisode();
+            }
+
             Logger?.LogInformation($"Processing {data}.");
 
             Episode item = new()
@@ -220,7 +226,7 @@ namespace CustomMetadataDB.Helpers
         {
             return new MetadataResult<Series>
             {
-                HasMetadata = true,
+                HasMetadata = false,
                 Item = new Series()
             };
         }
@@ -229,7 +235,7 @@ namespace CustomMetadataDB.Helpers
         {
             return new MetadataResult<Episode>
             {
-                HasMetadata = true,
+                HasMetadata = false,
                 Item = new Episode()
             };
         }

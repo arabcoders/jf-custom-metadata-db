@@ -20,6 +20,7 @@ public class EpisodeProvider : IRemoteMetadataProvider<Episode, EpisodeInfo>, IH
     public EpisodeProvider(ILogger<EpisodeProvider> logger)
     {
         _logger = logger;
+        Utils.Logger = logger;
     }
 
     public string Name => Constants.PLUGIN_NAME;
@@ -43,9 +44,7 @@ public class EpisodeProvider : IRemoteMetadataProvider<Episode, EpisodeInfo>, IH
         MetadataResult<Episode> result = new() { HasMetadata = false };
 
         cancellationToken.ThrowIfCancellationRequested();
-        _logger.LogDebug($"CMD Episode GetMetadata: {info.Name} ({info.Path})");
-
-        // -- do episode work here --
+        _logger.LogDebug($"CMD Episode GetMetadata Lookup: '{info.Name}' '({info.Path})'");
 
         var item = Utils.FileToInfo(info.Path);
         if (item.Path == "")
