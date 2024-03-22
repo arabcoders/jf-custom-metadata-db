@@ -213,7 +213,11 @@ namespace CustomMetadataDB.Helpers
                 item.ForcedSortName = time.ToString("yyyyMMdd") + '-' + item.Name;
             }
 
-            item.SetProviderId(Constants.PLUGIN_EXTERNAL_ID, data.ProviderIds[Constants.PLUGIN_EXTERNAL_ID]);
+            data.TryGetProviderId(Constants.PLUGIN_EXTERNAL_ID, out string id);
+            if (id != "")
+            {
+                item.SetProviderId(Constants.PLUGIN_EXTERNAL_ID, id);
+            }
 
             return new MetadataResult<Episode>
             {
