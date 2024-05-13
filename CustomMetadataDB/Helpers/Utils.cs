@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Text.RegularExpressions;
+using Jellyfin.Data.Enums;
 
 namespace CustomMetadataDB.Helpers
 {
@@ -27,7 +28,7 @@ namespace CustomMetadataDB.Helpers
             return new PersonInfo
             {
                 Name = name,
-                Type = PersonType.Director,
+                Type = PersonKind.Director,
                 ProviderIds = new Dictionary<string, string> { { Constants.PLUGIN_EXTERNAL_ID, provider_id } },
             };
         }
