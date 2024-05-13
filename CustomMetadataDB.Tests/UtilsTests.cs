@@ -3,11 +3,8 @@ using System;
 using System.IO;
 using CustomMetadataDB.Helpers;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace CustomMetadataDB.Tests
 {
