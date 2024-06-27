@@ -27,16 +27,21 @@ public class EpisodeProvider : IRemoteMetadataProvider<Episode, EpisodeInfo>, IH
 
     public bool HasChanged(BaseItem item, IDirectoryService directoryService)
     {
-        _logger.LogDebug($"DEP HasChanged: {item.Path}");
-
         FileSystemMetadata fileInfo = directoryService.GetFile(item.Path);
-        var result = fileInfo.Exists && fileInfo.LastWriteTimeUtc.ToUniversalTime() > item.DateLastSaved.ToUniversalTime();
 
-        string status = result ? "Has Changed" : "Has Not Changed";
+        if (false == fileInfo.Exists)
+        {
+            _logger.LogWarning($"CMD HasChanged: '{item.Path}' not found.");
+            return true;
+        }
 
-        _logger.LogDebug($"DEP HasChanged Result: {status}");
+        if (fileInfo.LastWriteTimeUtc.ToUniversalTime() > item.DateLastSaved.ToUniversalTime())
+        {
+            _logger.LogInformation($"CMD HasChanged: '{item.Path}' has changed");
+            return true;
+        }
 
-        return result;
+        return false;
     }
 
     public Task<MetadataResult<Episode>> GetMetadata(EpisodeInfo info, CancellationToken cancellationToken)
