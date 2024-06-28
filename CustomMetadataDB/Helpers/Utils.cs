@@ -117,7 +117,7 @@ namespace CustomMetadataDB.Helpers
             season = season == "" ? year : season;
 
             string broadcastDate = (year != "" && month != "" && day != "") ? year + "-" + month + "-" + day : "";
-            if (broadcastDate == "" && file_date != null)
+            if (broadcastDate == "" && null != file_date)
             {
                 broadcastDate = file_date?.ToString("yyyy-MM-dd") ?? "";
             }
@@ -168,7 +168,7 @@ namespace CustomMetadataDB.Helpers
                 IndexNumber = int.Parse(episode),
                 Name = title,
                 Path = file,
-                Year = int.Parse(year),
+                Year = "" != year ? int.Parse(year) : null,
                 ParentIndexNumber = int.Parse(season)
             };
 
@@ -216,6 +216,12 @@ namespace CustomMetadataDB.Helpers
                 item.ProductionYear = time.Year;
                 item.SortName = $"{time:yyyyMMdd}-{item.IndexNumber} -{item.Name}";
                 item.ForcedSortName = $"{time:yyyyMMdd}-{item.IndexNumber} -{item.Name}";
+            }
+
+            if (string.IsNullOrEmpty(item.SortName))
+            {
+                item.SortName = $"{item.ParentIndexNumber:0000}{item.IndexNumber:0000} - {item.Name}";
+                item.ForcedSortName = item.SortName;
             }
 
             data.TryGetProviderId(Constants.PLUGIN_EXTERNAL_ID, out string id);
