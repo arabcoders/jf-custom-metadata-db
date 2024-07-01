@@ -186,7 +186,26 @@ namespace CustomMetadataDB.Helpers
                 return new EpisodeInfo();
             }
 
-            Logger?.LogInformation($"Parsed '{System.IO.Path.GetFileName(file)}' as 'S{item.ParentIndexNumber}E{item.IndexNumber}' - {item.Name}'.");
+            // -- Multiple episode handling.
+            if (!item.PremiereDate.HasValue)
+            {
+                var match = Constants.MULTI_EPISODE_MATCHER.Match(filename);
+                if (match.Success)
+                {
+                    var matchIndexEnd = int.Parse(match.Groups["end"].Value);
+                    if (matchIndexEnd < item.IndexNumber)
+                    {
+                        Logger?.LogError($"Invalid multi-episode range in '{filename}'.");
+                    }
+                    else
+                    {
+                        item.IndexNumberEnd = matchIndexEnd;
+                    }
+                }
+            }
+
+            var indexEnd = item.IndexNumberEnd.HasValue ? $"-E{item.IndexNumberEnd}" : "";
+            Logger?.LogInformation($"Parsed '{System.IO.Path.GetFileName(file)}' as 'S{item.ParentIndexNumber}E{item.IndexNumber}{indexEnd}' - {item.Name}'.");
 
             return item;
         }
@@ -206,6 +225,7 @@ namespace CustomMetadataDB.Helpers
             {
                 Name = data.Name,
                 IndexNumber = data.IndexNumber,
+                IndexNumberEnd = data.IndexNumberEnd,
                 ParentIndexNumber = data.ParentIndexNumber,
                 Path = data.Path,
             };

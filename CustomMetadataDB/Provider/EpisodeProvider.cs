@@ -27,6 +27,7 @@ public class EpisodeProvider : IRemoteMetadataProvider<Episode, EpisodeInfo>, IH
 
     public bool HasChanged(BaseItem item, IDirectoryService directoryService)
     {
+        try{
         FileSystemMetadata fileInfo = directoryService.GetFile(item.Path);
 
         if (false == fileInfo.Exists)
@@ -35,10 +36,15 @@ public class EpisodeProvider : IRemoteMetadataProvider<Episode, EpisodeInfo>, IH
             return true;
         }
 
-        if (fileInfo.LastWriteTimeUtc.ToUniversalTime() > item.DateLastSaved.ToUniversalTime())
+        if (fileInfo.CreationTimeUtc.ToUniversalTime() > item.DateLastSaved.ToUniversalTime())
         {
             _logger.LogInformation($"CMD HasChanged: '{item.Path}' has changed");
             return true;
+        }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"CMD HasChanged: For path '{item.Path}' failed. '{ex.Message}'.");
         }
 
         return false;
