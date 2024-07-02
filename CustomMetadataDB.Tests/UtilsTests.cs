@@ -13,6 +13,12 @@ namespace CustomMetadataDB.Tests
         private static readonly DTO[] _data = LoadFixtureData();
         private static readonly ILogger<UtilsTest> _logger = SetLogger();
 
+        private static ILogger<UtilsTest> SetLogger()
+        {
+            using ILoggerFactory loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+            return loggerFactory.CreateLogger<UtilsTest>();
+        }
+
         private static DTO[] LoadFixtureData()
         {
             var assembly = Assembly.GetExecutingAssembly();
@@ -73,8 +79,8 @@ namespace CustomMetadataDB.Tests
         public void Test_file_to_info()
         {
             var path = "/home/media/test/201012 foobar ep24 - ahmed [foo].mkv";
-            var item = Utils.FileToInfo(path, new DateTime(2021, 1, 1, 01, 02, 03, DateTimeKind.Utc));
-            Assert.Equal(110120203, item.IndexNumber);
+            var item = Utils.FileToInfo(path);
+            Assert.Equal(110125248, item.IndexNumber);
             Assert.Equal(2020, item.ParentIndexNumber);
             Assert.Equal(2020, item.Year);
             Assert.Equal("ep24 - ahmed", item.Name);
@@ -85,13 +91,13 @@ namespace CustomMetadataDB.Tests
         public void Test_ToEpisode()
         {
             var path = "/home/media/test/201012 foobar ep24 - ahmed [foo].mkv";
-            var result = Utils.ToEpisode(Utils.FileToInfo(path, new DateTime(2021, 1, 1, 01, 02, 03, DateTimeKind.Utc)));
+            var result = Utils.ToEpisode(Utils.FileToInfo(path));
 
             Assert.True(result.HasMetadata);
 
             var item = result.Item;
 
-            Assert.Equal(110120203, item.IndexNumber);
+            Assert.Equal(110125248, item.IndexNumber);
             Assert.Equal(2020, item.ParentIndexNumber);
             Assert.Equal("ep24 - ahmed", item.Name);
             Assert.Equal($"{item.IndexNumber}", item.ProviderIds[Constants.PLUGIN_EXTERNAL_ID]);
@@ -132,10 +138,16 @@ namespace CustomMetadataDB.Tests
             Assert.Equal(indexEnd, item.IndexNumberEnd);
         }
 
-        private static ILogger<UtilsTest> SetLogger()
+        [Theory]
+        [InlineData("230629 Yoake no LOVE it! - BAT [720p h264 MP4 CM Cut].mkv", 4957)]
+        [InlineData("240629 Yoake no LOVE it! - FOO [720p h264 MP4 CM Cut].mkv", 4955)]
+        [InlineData("240629 Yoake no LOVE it! - BAR [820p h264 MP4 CM Cut].mkv", 5451)]
+        [InlineData("2406 NO [820p h264 MP4 CM Cut].mkv", 9852)]
+        [InlineData("2306 OK [820p h264 MP4 CM Cut].mkv", 1025)]
+        [InlineData("2206 TEST [820p h264 MP4 CM Cut].mkv", 5398)]
+        public void Test_ExtendId(string filename, int expected)
         {
-            using ILoggerFactory loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-            return loggerFactory.CreateLogger<UtilsTest>();
+            Assert.Equal(expected, Utils.ExtendId(filename));
         }
     }
 }
