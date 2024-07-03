@@ -59,6 +59,8 @@ namespace CustomMetadataDB.Helpers
             string fourDigitString = asciiString.Length >= 4 ? asciiString.Substring(0, 4) : asciiString.PadRight(4, '9');
             int fourDigitNumber = int.Parse(fourDigitString);
 
+            Logger?.LogDebug($"'basename: {basename}' - 'path: {path}' createID: '{fourDigitNumber}' : '{fourDigitString}'.");
+
             return fourDigitNumber;
         }
 
@@ -178,7 +180,7 @@ namespace CustomMetadataDB.Helpers
 
             if (episode == "")
             {
-                episode = $"1{month}{day}{ExtendId(filename)}";
+                episode = $"1{month}{day}{ExtendId(file)}";
             }
 
             episode = (episode == "") ? int.Parse('1' + month + day).ToString() : episode;
