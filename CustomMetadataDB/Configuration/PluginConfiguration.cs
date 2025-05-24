@@ -1,6 +1,6 @@
 using MediaBrowser.Model.Plugins;
 
-namespace CustomMetadataDB.Helpers.Configuration
+namespace CustomMetadataDB.Configuration
 {
     public class PluginConfiguration : BasePluginConfiguration
     {

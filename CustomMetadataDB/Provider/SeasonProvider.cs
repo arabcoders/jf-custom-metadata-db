@@ -10,7 +10,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediaBrowser.Controller.Entities.TV;
 
-namespace CustomMetadataDB;
+namespace CustomMetadataDB.Provider;
+
 public class SeasonProvider : IRemoteMetadataProvider<Season, SeasonInfo>
 {
     protected readonly ILogger _logger;
@@ -24,11 +25,10 @@ public class SeasonProvider : IRemoteMetadataProvider<Season, SeasonInfo>
 
     public Task<MetadataResult<Season>> GetMetadata(SeasonInfo info, CancellationToken cancellationToken)
     {
-        _logger.LogDebug($"CMD Season GetMetadata: {JsonSerializer.Serialize(info)}");
-
+        _logger.LogInformation($"CMD Season GetMetadata: {JsonSerializer.Serialize(info)}");
         cancellationToken.ThrowIfCancellationRequested();
 
-        var result = new MetadataResult<Season>
+        return Task.FromResult(new MetadataResult<Season>
         {
             HasMetadata = true,
             Item = new Season
@@ -36,9 +36,7 @@ public class SeasonProvider : IRemoteMetadataProvider<Season, SeasonInfo>
                 Name = info.Name,
                 IndexNumber = info.IndexNumber
             }
-        };
-
-        return Task.FromResult(result);
+        });
     }
 
     public Task<IEnumerable<RemoteSearchResult>> GetSearchResults(SeasonInfo searchInfo, CancellationToken cancellationToken) => throw new NotImplementedException();

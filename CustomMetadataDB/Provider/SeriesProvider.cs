@@ -2,7 +2,6 @@ using CustomMetadataDB.Helpers;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Providers;
-using MediaBrowser.Model.IO;
 using MediaBrowser.Model.Providers;
 using Microsoft.Extensions.Logging;
 using System;
@@ -15,7 +14,7 @@ using System.Threading.Tasks;
 using System.Web;
 using MediaBrowser.Controller.Entities.TV;
 
-namespace CustomMetadataDB;
+namespace CustomMetadataDB.Provider;
 
 public class SeriesProvider : IRemoteMetadataProvider<Series, SeriesInfo>
 {
@@ -43,9 +42,9 @@ public class SeriesProvider : IRemoteMetadataProvider<Series, SeriesInfo>
         {
             using var httpResponse = await QueryAPI("series", info.Name, cancellationToken).ConfigureAwait(false);
 
-            if (httpResponse.StatusCode != HttpStatusCode.OK)
+            if (HttpStatusCode.OK != httpResponse.StatusCode)
             {
-                _logger.LogInformation($"CMD Series GetMetadata: {info.Name} ({info.Path}) - Status Code: {httpResponse.StatusCode}");
+                _logger.LogError($"CMD Series GetMetadata: '{info.Name}' '{info.Path}' - Status Code: {httpResponse.StatusCode}");
                 return result;
             }
 
@@ -81,9 +80,9 @@ public class SeriesProvider : IRemoteMetadataProvider<Series, SeriesInfo>
         {
             using var httpResponse = await QueryAPI("series", searchInfo.Name, cancellationToken, limit: 20).ConfigureAwait(false);
 
-            if (httpResponse.StatusCode != HttpStatusCode.OK)
+            if (HttpStatusCode.OK != httpResponse.StatusCode)
             {
-                _logger.LogInformation($"CMD Series GetMetadata: {searchInfo.Name} ({searchInfo.Path}) - Status Code: {httpResponse.StatusCode}");
+                _logger.LogInformation($"CMD Series GetMetadata: '{searchInfo.Name}' '{searchInfo.Path}' - Status Code: {httpResponse.StatusCode}");
                 return result;
             }
 

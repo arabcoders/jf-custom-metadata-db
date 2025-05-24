@@ -11,7 +11,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CustomMetadataDB;
+namespace CustomMetadataDB.Provider;
 
 public class EpisodeProvider : IRemoteMetadataProvider<Episode, EpisodeInfo>, IHasItemChangeMonitor
 {
@@ -27,16 +27,28 @@ public class EpisodeProvider : IRemoteMetadataProvider<Episode, EpisodeInfo>, IH
 
     public bool HasChanged(BaseItem item, IDirectoryService directoryService)
     {
-        _logger.LogDebug($"DEP HasChanged: {item.Path}");
+        try
+        {
+            FileSystemMetadata fileInfo = directoryService.GetFile(item.Path);
 
-        FileSystemMetadata fileInfo = directoryService.GetFile(item.Path);
-        var result = fileInfo.Exists && fileInfo.LastWriteTimeUtc.ToUniversalTime() > item.DateLastSaved.ToUniversalTime();
+            if (false == fileInfo.Exists)
+            {
+                _logger.LogWarning($"CMD HasChanged: '{item.Path}' not found.");
+                return true;
+            }
 
-        string status = result ? "Has Changed" : "Has Not Changed";
+            if (fileInfo.CreationTimeUtc.ToUniversalTime() > item.DateLastSaved.ToUniversalTime())
+            {
+                _logger.LogInformation($"CMD HasChanged: '{item.Path}' has changed");
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"CMD HasChanged: For path '{item.Path}' failed. '{ex.Message}'.");
+        }
 
-        _logger.LogDebug($"DEP HasChanged Result: {status}");
-
-        return result;
+        return false;
     }
 
     public Task<MetadataResult<Episode>> GetMetadata(EpisodeInfo info, CancellationToken cancellationToken)
