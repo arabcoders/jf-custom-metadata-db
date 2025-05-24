@@ -11,7 +11,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CustomMetadataDB;
+namespace CustomMetadataDB.Provider;
 
 public class EpisodeProvider : IRemoteMetadataProvider<Episode, EpisodeInfo>, IHasItemChangeMonitor
 {
@@ -27,20 +27,21 @@ public class EpisodeProvider : IRemoteMetadataProvider<Episode, EpisodeInfo>, IH
 
     public bool HasChanged(BaseItem item, IDirectoryService directoryService)
     {
-        try{
-        FileSystemMetadata fileInfo = directoryService.GetFile(item.Path);
-
-        if (false == fileInfo.Exists)
+        try
         {
-            _logger.LogWarning($"CMD HasChanged: '{item.Path}' not found.");
-            return true;
-        }
+            FileSystemMetadata fileInfo = directoryService.GetFile(item.Path);
 
-        if (fileInfo.CreationTimeUtc.ToUniversalTime() > item.DateLastSaved.ToUniversalTime())
-        {
-            _logger.LogInformation($"CMD HasChanged: '{item.Path}' has changed");
-            return true;
-        }
+            if (false == fileInfo.Exists)
+            {
+                _logger.LogWarning($"CMD HasChanged: '{item.Path}' not found.");
+                return true;
+            }
+
+            if (fileInfo.CreationTimeUtc.ToUniversalTime() > item.DateLastSaved.ToUniversalTime())
+            {
+                _logger.LogInformation($"CMD HasChanged: '{item.Path}' has changed");
+                return true;
+            }
         }
         catch (Exception ex)
         {

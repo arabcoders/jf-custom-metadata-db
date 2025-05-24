@@ -10,7 +10,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediaBrowser.Controller.Entities.TV;
 
-namespace CustomMetadataDB;
+namespace CustomMetadataDB.Provider;
+
 public class SeasonProvider : IRemoteMetadataProvider<Season, SeasonInfo>
 {
     protected readonly ILogger _logger;
