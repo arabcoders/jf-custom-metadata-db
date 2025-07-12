@@ -65,7 +65,7 @@ public class EpisodeProvider : IRemoteMetadataProvider<Episode, EpisodeInfo>, IH
             return Task.FromResult(result);
         }
 
-        return Task.FromResult(Utils.ToEpisode(item));
+        return Task.FromResult(Utils.ToEpisode(item, info.Path));
     }
 
     public Task<IEnumerable<RemoteSearchResult>> GetSearchResults(EpisodeInfo searchInfo, CancellationToken cancellationToken) => throw new NotImplementedException();
