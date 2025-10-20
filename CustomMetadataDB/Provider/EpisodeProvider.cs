@@ -48,7 +48,7 @@ public class EpisodeProvider : IRemoteMetadataProvider<Episode, EpisodeInfo>, IH
             _logger.LogError(ex, $"CMD HasChanged: For path '{item.Path}' failed. '{ex.Message}'.");
         }
 
-        return false;
+        return true;
     }
 
     public Task<MetadataResult<Episode>> GetMetadata(EpisodeInfo info, CancellationToken cancellationToken)

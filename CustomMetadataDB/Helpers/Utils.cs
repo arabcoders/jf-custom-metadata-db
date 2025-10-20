@@ -186,6 +186,10 @@ public class Utils
         }
 
         episode = (episode == "") ? int.Parse('1' + month + day).ToString() : episode;
+        if (season == "" && year != "")
+        {
+            season = year;
+        }
 
         EpisodeInfo item = new()
         {
@@ -260,6 +264,7 @@ public class Utils
             item.ProductionYear = time.Year;
             item.SortName = $"{time:yyyyMMdd}-{item.IndexNumber} -{item.Name}";
             item.ForcedSortName = $"{time:yyyyMMdd}-{item.IndexNumber} -{item.Name}";
+            item.ParentIndexNumber = time.Year;
         }
 
         if (string.IsNullOrEmpty(item.SortName))
@@ -291,6 +296,16 @@ public class Utils
             {
                 item.PremiereDate = date;
                 item.ProductionYear = date.Year;
+            }
+
+            if (nfoData.TryGetValue("season", out var nfo_season) && int.TryParse(nfo_season, out var season))
+            {
+                item.ParentIndexNumber = season;
+            }
+
+            if (nfoData.TryGetValue("episode", out var nfo_episode) && int.TryParse(nfo_episode, out var episode))
+            {
+                item.IndexNumber = episode;
             }
         }
 
