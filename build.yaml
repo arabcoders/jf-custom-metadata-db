@@ -1,13 +1,16 @@
----
 name: "Custom metadata agent db"
 guid: "83b77e24-9fce-4ee0-a794-73fdfa972e66"
-version: "1.2.0.2"
-targetAbi: "10.7.0.0"
+imageUrl: "https://raw.githubusercontent.com/arabcoders/jf-custom-metadata-db/master/logo.png"
+version: "1.3.0.0"
+targetAbi: "10.11.0.0"
+framework: "net9.0"
 owner: "arabcoders"
 overview: "A Custom metadata agent."
-description: "This plugin add support for custom metadata agent."
+description: >
+  This plugin add support for custom metadata agent.
+
 category: "Metadata"
 artifacts:
   - "CustomMetadataDB.dll"
-changelog: >
-  changelog
+changelog: |-
+  - See github releases for more information.

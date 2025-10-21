@@ -12,6 +12,8 @@ using Jellyfin.Data.Enums;
 using System.Security.Cryptography;
 using System.Text;
 using System.IO;
+using System.Linq;
+using System.Xml.Linq;
 
 namespace CustomMetadataDB.Helpers;
 
@@ -184,6 +186,10 @@ public class Utils
         }
 
         episode = (episode == "") ? int.Parse('1' + month + day).ToString() : episode;
+        if (season == "" && year != "")
+        {
+            season = year;
+        }
 
         EpisodeInfo item = new()
         {
@@ -233,7 +239,7 @@ public class Utils
     }
 
 
-    public static MetadataResult<Episode> ToEpisode(EpisodeInfo data)
+    public static MetadataResult<Episode> ToEpisode(EpisodeInfo data, string file = null)
     {
         if (data.Path == "")
         {
@@ -258,6 +264,7 @@ public class Utils
             item.ProductionYear = time.Year;
             item.SortName = $"{time:yyyyMMdd}-{item.IndexNumber} -{item.Name}";
             item.ForcedSortName = $"{time:yyyyMMdd}-{item.IndexNumber} -{item.Name}";
+            item.ParentIndexNumber = time.Year;
         }
 
         if (string.IsNullOrEmpty(item.SortName))
@@ -272,9 +279,115 @@ public class Utils
             item.SetProviderId(Constants.PLUGIN_EXTERNAL_ID, id);
         }
 
+        if (!string.IsNullOrEmpty(file))
+        {
+            var nfoData = GetEpisodeNfo(file);
+            if (nfoData.TryGetValue("title", out var nfo_title))
+            {
+                item.Name = nfo_title;
+            }
+
+            if (nfoData.TryGetValue("overview", out var nfo_overview))
+            {
+                item.Overview = nfo_overview;
+            }
+
+            if (nfoData.TryGetValue("aired", out var aired) && DateTime.TryParse(aired, out var date))
+            {
+                item.PremiereDate = date;
+                item.ProductionYear = date.Year;
+            }
+
+            if (nfoData.TryGetValue("season", out var nfo_season) && int.TryParse(nfo_season, out var season))
+            {
+                item.ParentIndexNumber = season;
+            }
+
+            if (nfoData.TryGetValue("episode", out var nfo_episode) && int.TryParse(nfo_episode, out var episode))
+            {
+                item.IndexNumber = episode;
+            }
+        }
+
         return new() { HasMetadata = true, Item = item };
     }
 
     private static MetadataResult<Series> ErrorOut() => new() { HasMetadata = false, Item = new Series() };
     private static MetadataResult<Episode> ErrorOutEpisode() => new() { HasMetadata = false, Item = new Episode() };
+
+    public static Dictionary<string, string> GetEpisodeNfo(string path)
+    {
+        var info = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return info;
+        }
+
+        try
+        {
+            string nfoPath = Path.ChangeExtension(path, ".nfo");
+
+            if (!File.Exists(nfoPath))
+            {
+                return info;
+            }
+
+            Logger?.LogInformation($"GetEpisodeNfo() - nfoFile: {nfoPath}");
+
+            string rawXml = File.ReadAllText(nfoPath);
+
+            // Fix invalid ampersands
+            rawXml = Regex.Replace(rawXml, @"&(?![A-Za-z]+[0-9]*;|#[0-9]+;|#x[0-9a-fA-F]+;)", "&amp;");
+            // Remove junk self-closing tags on their own lines
+            rawXml = Regex.Replace(rawXml, @"^\s*<.*/>\s*$", "", RegexOptions.Multiline);
+
+            XElement root;
+            try
+            {
+                var doc = XDocument.Parse(rawXml);
+                root = doc.Descendants("episodedetails").FirstOrDefault();
+                if (root == null)
+                {
+                    Logger?.LogError($"GetEpisodeNfo() - No <episodedetails> found in: {nfoPath}");
+                    return info;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger?.LogError($"GetEpisodeNfo() - Failed to parse XML: {ex.Message}");
+                return info;
+            }
+
+            var keys = new List<(string xmlKey, string infoKey)>
+            {
+                ("title", "title"),
+                ("season", "season"),
+                ("episode", "episode"),
+                ("aired", "aired"),
+                ("plot", "overview")
+            };
+
+            foreach (var (xmlKey, infoKey) in keys)
+            {
+                var element = root.Element(xmlKey);
+                if (element != null)
+                {
+                    string value = element.Value.Trim();
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        info[infoKey] = value;
+                    }
+                }
+            }
+
+            return info;
+        }
+        catch (Exception ex)
+        {
+            Logger?.LogError($"GetEpisodeNfo() - Exception: {ex.Message}");
+            Logger?.LogError(ex.ToString());
+            return info;
+        }
+    }
 }

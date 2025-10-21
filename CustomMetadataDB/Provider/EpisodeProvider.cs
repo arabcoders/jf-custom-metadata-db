@@ -48,7 +48,7 @@ public class EpisodeProvider : IRemoteMetadataProvider<Episode, EpisodeInfo>, IH
             _logger.LogError(ex, $"CMD HasChanged: For path '{item.Path}' failed. '{ex.Message}'.");
         }
 
-        return false;
+        return true;
     }
 
     public Task<MetadataResult<Episode>> GetMetadata(EpisodeInfo info, CancellationToken cancellationToken)
@@ -65,7 +65,7 @@ public class EpisodeProvider : IRemoteMetadataProvider<Episode, EpisodeInfo>, IH
             return Task.FromResult(result);
         }
 
-        return Task.FromResult(Utils.ToEpisode(item));
+        return Task.FromResult(Utils.ToEpisode(item, info.Path));
     }
 
     public Task<IEnumerable<RemoteSearchResult>> GetSearchResults(EpisodeInfo searchInfo, CancellationToken cancellationToken) => throw new NotImplementedException();
