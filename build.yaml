@@ -1,7 +1,7 @@
 name: "Custom metadata agent db"
 guid: "83b77e24-9fce-4ee0-a794-73fdfa972e66"
 imageUrl: "https://raw.githubusercontent.com/arabcoders/jf-custom-metadata-db/master/logo.png"
-version: "1.3.0.0"
+version: "1.6.0.0"
 targetAbi: "10.11.0.0"
 framework: "net9.0"
 owner: "arabcoders"
