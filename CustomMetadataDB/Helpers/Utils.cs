@@ -233,7 +233,7 @@ public class Utils
         }
 
         var indexEnd = item.IndexNumberEnd.HasValue ? $"-E{item.IndexNumberEnd}" : "";
-        Logger?.LogInformation($"Parsed '{Path.GetFileName(file)}' as 'S{item.ParentIndexNumber}E{item.IndexNumber}{indexEnd}': '{item.Name}'.");
+        Logger?.LogDebug($"Parsed '{Path.GetFileName(file)}' as 'S{item.ParentIndexNumber}E{item.IndexNumber}{indexEnd}': '{item.Name}'.");
 
         return item;
     }

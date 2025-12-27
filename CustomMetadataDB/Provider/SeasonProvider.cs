@@ -27,7 +27,7 @@ public class SeasonProvider : IRemoteMetadataProvider<Season, SeasonInfo>
 
     public Task<MetadataResult<Season>> GetMetadata(SeasonInfo info, CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"CMD Season GetMetadata: {JsonSerializer.Serialize(info)}");
+        _logger.LogDebug($"CMD Season GetMetadata: {JsonSerializer.Serialize(info)}");
         cancellationToken.ThrowIfCancellationRequested();
         var session = new MetadataResult<Season> { HasMetadata = false };
 
