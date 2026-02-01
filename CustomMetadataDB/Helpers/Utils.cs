@@ -333,7 +333,7 @@ public class Utils
                 return info;
             }
 
-            Logger?.LogInformation($"GetEpisodeNfo() - nfoFile: {nfoPath}");
+            Logger?.LogDebug($"GetEpisodeNfo() - nfoFile: {nfoPath}");
 
             string rawXml = File.ReadAllText(nfoPath);
 
